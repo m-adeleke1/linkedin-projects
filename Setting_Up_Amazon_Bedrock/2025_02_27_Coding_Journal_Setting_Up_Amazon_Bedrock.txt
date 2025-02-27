@@ -1,0 +1,220 @@
+Learning Amazon Bedrock
+
+A special thanks to Parna Metha and to Lee Assam for teaching detailed instructions on how to setup an AWS account to work with Bedrock and Foundation models, as well as provide an introduction to some key python modules and other AI software that can be used to enhance AI models and/or adjust them to become production ready. 
+
+
+The following instructions are based on the following sources:
+
+
+Parna Mehta - Foundation Models Hands on workshop and Role of an AWS Solutions Architect.
+
+https://www.youtube.com/live/nmNV_jjnpik?si=JrsQw4UrIgy15Q1Z (I would recommend the 24:04 timestamp)
+
+Lee Assam - Learning Amazon Bedrock from LinkedIn Learning (premium LinkedIn account may be required for access)
+
+https://www.linkedin.com/learning/learning-amazon-bedrock-23090599
+
+
+
+Account Setup and Model Access Activation for your AWS Account:
+
+
+1. Sign up for an AWS account:
+
+Go to https://aws.amazon.com/ and click "Create an AWS Account"
+
+Follow the online instructions to create your account
+
+
+2. Create an IAM user:
+
+Go to the AWS Console and search for IAM
+
+Click on "Users" and then "Create user"
+
+Name the user (e.g., "bedrock-user")
+
+
+3. Create a user group:
+
+Click on "Create group"
+
+Name the group (e.g., "bedrock")
+
+Search for and select the "AmazonBedrockFullAccess" policy
+
+Create the user group
+
+
+
+4. Associate the user with the group:
+
+Select the newly created group
+
+Click "Next" and then "Create user"
+
+
+
+5. Generate access keys:
+
+Click on the created user
+
+Go to the "Security credentials" tab
+
+Click "Create access key"
+
+Select "Other" and proceed
+
+Download the .csv file containing the access key ID and secret access key
+
+
+
+6. REQUEST ACCESS TO FOUNDATION MODELS (IMPORTANT):
+
+Launch Amazon Bedrock service in the AWS Console
+
+Click "Get started"
+
+Navigate to "Model access" in the left sidebar
+
+Click "Manage model access"
+
+Select the appropriate AWS Region (please choose us-east-1 OR us-west-2 if possible for compatibility with the tutorials)
+
+Check the box to select all models
+
+Submit use case for Claude (Anthropic):
+
+Click "Submit use case details"
+
+Fill in required information (company name, website, industry, etc.)
+
+Provide use case details
+
+Submit the form
+
+
+
+
+7. Request model access:
+
+Ensure all models are selected
+
+Click "Request model access"
+
+Wait for approval:
+
+Some models grant immediate access
+
+Others (like Claude) may take a few minutes to a couple of hours for approval
+
+
+
+
+
+
+Set up a GitHub Account (this is important for establishing a repository, which is basically just secure storage, for your coding projects)
+
+
+1. Navigate to GitHub:
+
+Go to GitHub.com
+
+Sign Up:
+
+Click on the "Sign up" button in the top right corner.
+
+Follow the prompts to create your account.
+
+Enter Your Details:
+
+Provide your email address.
+
+Choose a password (use a strong and unique one).
+
+Select a username that isn't already taken (make it meaningful if you plan to use it professionally).
+
+Verify Your Email:
+
+After signing up, GitHub will send you an email to verify your address.
+
+Click on the verification link in the email to complete this step.
+
+Complete Additional Steps (Optional):
+
+You may be asked to complete a CAPTCHA or answer some personalization questions. You can skip these if you prefer.
+
+Configure Two-Factor Authentication (2FA):
+
+It's highly recommended to set up 2FA for added security. You can do this in your account settings.
+
+For more detailed instructions and official documentation, visit GitHub's Getting Started Guide.
+
+Official Link to Sign Up: https://github.com/ or directly to the sign-up page.
+
+
+
+
+
+
+Set up AWS Credentials for your account securely with GitHub Codespaces
+
+
+*This is a highly recommended step for interacting with Amazon Bedrock. It is based on setting up a GitHub account. Codespaces is a service on GitHub that allows for users to securely store credentials like sign in usernames, passwords, and any other variables for secure use within third party sources like cloud environments, Heroku, etc.). I recommend Codespaces because it is more versatile for a variety of platforms, but if you are committed to AWS, you can try a service like Parameter Store for an in-vendor solution. Please seek documentation for more details. 
+
+
+1. Log into your GitHub account and access the settings:
+
+Click on your profile picture or icon in the top right
+
+Select "Settings"
+
+Navigate to Codespaces settings:
+
+Scroll down and click on "Codespaces" in the left navigation
+
+Create three Codespaces secrets:
+
+a. AWS Access Key ID:
+
+Click "New secret"
+
+Name: AWS_ACCESS_KEY_ID
+
+Value: Copy from the CSV file downloaded when creating the IAM user
+
+Select the appropriate repository (e.g., "learning Amazon Bedrock from LinkedIn")
+
+Click "Add secret"
+
+b. AWS Secret Access Key:
+
+Click "New secret"
+
+Name: AWS_SECRET_ACCESS_KEY
+
+Value: Copy from the CSV file
+
+Select the same repository
+
+Click "Add secret"
+
+c. AWS Default Region:
+
+Click "New secret"
+
+Name: AWS_DEFAULT_REGION
+
+Value: Enter the region where you set up access for Amazon Bedrock models (e.g., us-west-2)
+
+Select the same repository
+
+Click "Add secret"
+
+
+
+
+
+Et Voila! This is a great start for users who are curious about how to interact with Amazon Bedrock. From here, I suggest you watch more from both courses about how to interact with Amazon Playgrounds, Python modules like Boto3 (which allows python to interact with AWS), Langchain for manipulation of LLMs, RAG implementation on Bedrock models, and instant LLM-to-production services like Streamlit. Give it a go, sign up for LinkedIn Learning, and explore the amazing capacities of Amazon Bedrock!
+
+
