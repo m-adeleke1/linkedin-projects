@@ -1,1 +1,11 @@
-
+uvicorn
+asyncpg
+click
+fastapi
+gunicorn
+h11
+psycopg2-binary
+pydantic
+starlette
+websockets
+fastmcp
