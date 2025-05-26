@@ -1,0 +1,318 @@
+This one is exciting folks! A brand new protocol called MCP. What is it? It's a USB-Connector for your AI Apps to use other tools on the internet! In this project, I'll show you how it works by asking a real time question to ChatGPT (the betting odds for a game that hasn't happened yet). The only way it can get real time information in this case is for the OpenAI API to call Brave Search within the project to make everything work. 
+
+
+Here is a step by step way to get this thing up and running!
+
+
+
+1. Set up a GitHub Codespaces environment. Go to github.com, and either set up an account or login. Once your logged in, create a folder for your project. Within that github folder, create a folder called 'terraform'. Within the terraform folder, create a main.tf file, a provider.tf file, a variables.tf file, and an outputs.tf file. 
+
+main.tf code:
+
+resource "aws_security_group" "allow_ssh_http" {
+  name        = "allow_ssh_http"
+  description = "Allow SSH and HTTP"
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "openai_server" {
+  ami                    = var.openai_ami
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
+  tags = {
+    Name = "openai-server"
+  }
+}
+
+resource "aws_instance" "mcp_server" {
+  ami                    = var.mcp_ami
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
+  tags = {
+    Name = "mcp-server"
+  }
+}
+
+
+
+
+outputs.tf code:
+
+output "openai_server_public_ip" {
+  value = aws_instance.openai_server.public_ip
+}
+
+output "mcp_server_public_ip" {
+  value = aws_instance.mcp_server.public_ip
+}
+
+
+
+
+
+provider.tf code:
+
+provider "aws" {
+  region = var.aws_region
+}
+
+
+
+
+
+variables.tf
+
+variable "aws_region" {
+  default = "us-east-1"
+}
+
+variable "instance_type" {
+  default = "t2.micro"
+}
+
+variable "key_name" {
+  description = "SSH key pair name in your AWS account"
+}
+
+variable "openai_ami" {
+  description = "AMI for OpenAI prompt server"
+  default     = "ami-0c94855ba95c71c99" # Ubuntu 18.04 LTS (example, update as needed)
+}
+
+variable "mcp_ami" {
+  description = "AMI for MCP/Brave server"
+  default     = "ami-0c94855ba95c71c99" # Ubuntu 18.04 LTS (example, update as needed)
+}
+
+
+
+Open up a GitHub CodeSpaces environment (that should be complete with VS Code already set up). 
+
+
+
+2. Either set up an AWS account or use an AWS sandbox account to get access to AWS Services. Personally, I use Pluralsight to access AWS, which is great for such a project!
+
+
+
+3. Once you have entered your AWS account, make sure to download the AWS CLI in your CodeSpaces environment. Make sure to search for how to install it in your Codespaces environment. Once that is done, make sure to type 'aws configure' in a bash environment, enter the access key, access key id, default region (in this case, it's us-east-1), and the default file type (which should be 'json'). 
+
+
+
+4. Make sure to download a key file in order to access your ec2 instances. In order to do that, make sure to go to the 'EC2' section in AWS (you can type 'EC2' in the services search to get there), and look at Key Pairs on the left hand side. Click 'create key pair', make sure it's a .pem file, and download the file to your computer. Once it's downloaded, make sure to drag it to the terraform folder in your GitHub CodeSpaces environment.
+
+
+
+5. Try a 'terraform init', 'terraform plan', and 'terraform apply' in your CodeSpaces environment. If it doesn't work, make sure to search for a solution using search. It should be a simple solution to make sure terraform is properly downloaded and configured within CodeSpaces.
+
+
+6. If you've made it this far then congratulations! You should have a couple of EC2 instances in your AWS account ready to go.
+
+
+7. Make sure to change the permissions on your key file using chmod:
+
+chmod 400 ./[name-of-your-key-file]
+
+
+8. The output of your terraform apply should provide the ip addresses of the public servers that you plan to access.
+
+you should be able to ssh from your CodeSpaces environment using the generic code:
+
+ssh -i ./[name-of-your-key-file] ubuntu@34.238.242.233
+
+where: 
+
+34.238.242.233 is the public ip address for the server
+'ubuntu' may be 'ec2-user' depending on the Linux distro that supports your EC2 servers
+
+
+
+9. Set up API Keys with OpenAI And Brave Search. Search for directions about how to do this step -- it's straightforward and easy to do. Just make sure to use the copy button IMMEDIATELY AFTER your API keys are created (DO NOT close those API Key created dialog boxes until you have copied the key and pasted it somewhere safe.)
+
+
+
+
+10. ssh into your open ai server. Make sure to export the api keys that you obtained as variables in your environment:
+
+export OPENAI_API_KEY=[your-open-ai-key]
+export BRAVE_API_KEY=[your-brave-api-key]
+ 
+Also, make sure to install the required dependencies:
+
+sudo yum update (replace 'yum' in the linux commands with 'apt-get' depending on the Linux distribution for your EC2)
+sudo yum install -y git curl build-essential
+
+sudo yum install -y python3-pip
+pip3 install fastapi uvicorn openai
+
+If you are having trouble with the python commands, it's because the python pre-installed is outdated. Make sure python is at least 3.9. Below is some code that I used to fix the problem, but to be safe and to gain confidence in your own skills, you should research a solution:
+
+sudo yum groupinstall "Development Tools" -y
+sudo yum install gcc openssl-devel bzip2-devel libffi-devel xz-devel wget -y
+
+cd /usr/src
+sudo wget https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tgz
+sudo tar xzf Python-3.9.13.tgz
+cd Python-3.9.13
+sudo ./configure --enable-optimizations
+sudo make altinstall
+
+
+once that is done, try 'python[version number]' in front of the code to make sure the dependencies are installed correctly.
+
+python3.9 -m pip install --upgrade pip
+python3.9 -m pip install fastapi uvicorn openai
+
+
+create an 'app.py' file by typing 'nano app.py' 
+
+Use the code below to populate the file. This is the key app logic that will use FastAPI to determine whether or not to consult OpenAI and/or Brave Search:
+
+import os
+from fastapi import FastAPI, Request, HTTPException
+import openai
+import httpx
+
+app = FastAPI()
+
+# OpenAI setup
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+if not client.api_key:
+    raise Exception("OPENAI_API_KEY environment variable not set")
+
+# Brave setup
+BRAVE_API_KEY = os.getenv("BRAVE_API_KEY")
+if not BRAVE_API_KEY:
+    raise Exception("BRAVE_API_KEY environment variable not set")
+
+@app.post("/prompt")
+async def prompt(request: Request):
+    data = await request.json()
+    prompt_text = data.get("prompt", "")
+    if not prompt_text:
+        raise HTTPException(status_code=400, detail="No prompt provided")
+
+    try:
+        # Fetch Brave Search results
+        headers = {
+            "X-Subscription-Token": BRAVE_API_KEY,
+            "Accept": "application/json",
+            "Api-Version": "2023-10-11"
+        }
+        params = {"q": prompt_text, "count": 3}
+        async with httpx.AsyncClient() as http_client:
+            brave_response = await http_client.get(
+                "https://api.search.brave.com/res/v1/web/search",
+                headers=headers,
+                params=params
+            )
+            if brave_response.status_code != 200:
+                raise HTTPException(status_code=brave_response.status_code, detail=brave_response.text)
+            brave_data = brave_response.json()
+            snippets = "\n".join(
+                [item["description"] for item in brave_data.get("web", {}).get("results", [])]
+            )
+
+        # Construct combined prompt to explicitly use search results
+        combined_prompt = (
+            f"Use the following recent web search results to answer the question as accurately as possible. "
+            f"If the information is not available in the search results, say so clearly.\n\n"
+            f"Search results:\n{snippets}\n\n"
+            f"Question: {prompt_text}\n\nAnswer:"
+        )
+
+        # Call OpenAI with the combined prompt
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": combined_prompt}],
+            max_tokens=300,
+            temperature=0
+        )
+        return {"response": response.choices[0].message.content.strip()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+Make sure to press CTRL+O to save the file, and CTRL+X to close and exit out of the file.
+
+
+
+11. launch the openai server with the code below.
+
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+Once that is done, open a new bash terminal.
+
+
+
+11. ssh into your brave search server. Again, make sure to export the api keys. In addition to installing the code above for the openai server (minus the pip3 install command...just make sure python is installed), make sure to install nodejs. Below is a code solution for Amazon Linux 2:
+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+npm install express axios
+
+
+
+
+
+12. If you ever need to make any changes, be sure to reboot the uvicorn server. To do that, make sure to identify the thread process by using the code below:
+
+sudo netstat -tulnp | grep 8000
+
+
+Once you have the thread (number on the right hand side of the output), make sure to kill the process by using the thread (also called the process ID)
+
+kill 12345 (example process ID)
+
+then, try to reboot uvicorn using the code below:
+
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+and then open a new prompt window
+
+
+
+13. Et voila! You should be all set to start testing the OpenAI API if you've made it this far! In my CodeSpaces bash, I tried something to the effect of:
+
+curl -X POST http://<your_server_ip>:8000/prompt \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Tell me a prediction for who is going to win the Knicks Pacers game on May 27th, 2025"}'
+
+The game hasn't been played yet as of me writing these notes. Before the brave integration was working properly, OpenAI responded "I do not have the ability to comment on upcoming events as it is not in my training data..." With brave search integration, it gave me a concise response with spread predictions -- which must have only come from Brave Search.
+
+
+
+
+
+
+
+
+
+
+
+
