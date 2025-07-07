@@ -1,0 +1,143 @@
+{
+  "name": "LLM_Resp_Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -800,
+        -240
+      ],
+      "id": "c90ac9df-2bae-486b-a981-b8e7018804a6",
+      "name": "When chat message received",
+      "webhookId": "40cbec11-e161-4553-9d5b-6aba3f839369",
+      "notesInFlow": false,
+      "notes": "This trigger will activate when the user inputs a chat message"
+    },
+    {
+      "parameters": {
+        "content": "## Chat Trigger\nUpon user chat input, this trigger will activate",
+        "height": 260,
+        "width": 300,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        -340
+      ],
+      "id": "f5be70a7-a8ee-4c90-9606-a1535b1f8869",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -480,
+        -320
+      ],
+      "id": "b7e0e9dd-5a88-4541-9a99-5cb1df42fde7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "responseFormat": "text",
+          "temperature": 0.4,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -580,
+        -80
+      ],
+      "id": "a6713eb1-b3ca-43ed-868f-f11a49a369df",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "3k4qMvsUycQvdu0O",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -120
+      ],
+      "id": "5b7d6ee5-b350-4d10-b966-38d24b3408fa",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "86759faf-f922-4143-b3f3-58ce87b4ae62",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b808dfade922d5e61d63198af82136c4fbc71559d0e381963ffe19b37259e0c"
+  },
+  "id": "SeBQp0b3m6UVzYhy",
+  "tags": []
+}
